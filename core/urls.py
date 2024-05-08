@@ -14,17 +14,32 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from django_api_admin.sites import site
 
 from core import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
-    path('api_admin/', site.urls),
+    path('i18n/', include('django.conf.urls.i18n')),
+    path('api/v1/auth/user/', include('apps.user.urls')),
+    path('api/v1/general/', include('apps.general.urls')),
+    path('api/v1/conversation/', include('apps.conversation.urls')),
+    path('api/v1/discovery/', include('apps.discovery.urls')),
+    path('api/v1/blog/', include('apps.blog.urls')),
+    path('api/v1/notification/', include('apps.notification.urls')),
+    path('api/v1/friend/', include('apps.friend.urls')),
+    path('api/v1/payment/', include('apps.payment.urls')),
     path('admin/', admin.site.urls),
+    path('api_admin/', site.urls),
 ]
+
+urlpatterns += [path('silk/', include('silk.urls', namespace='silk'))]
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+admin.site.site_header = "TOK Admin"
+admin.site.site_title = "TOKTOK"
+admin.site.index_title = "Chào mừng đến với TOK"

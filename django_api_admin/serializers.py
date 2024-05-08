@@ -21,25 +21,26 @@ class LoginSerializer(serializers.Serializer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.user_cache = None
-        # create the username field
+
+        # Define the username field
         username_field = UserModel._meta.get_field(UserModel.USERNAME_FIELD)
-        self.username = serializers.ModelSerializer.serializer_field_mapping[username_field.__class__](
-            max_length=username_field.max_length, required=True)
+        self.username = serializers.CharField(max_length=username_field.max_length, required=True)
         self._declared_fields[UserModel.USERNAME_FIELD] = self.username
+
+        # Define the password field
         self.password = serializers.CharField(label='Password', write_only=True, required=True,
                                               style={'input_type': 'password'}, max_length=80, min_length=7)
         self._declared_fields['password'] = self.password
 
-        # add the custom error messages to self.error_messages
+        # Define the phone number field
+        self.phone_number = serializers.CharField(max_length=20, required=True)
+        self._declared_fields['phone_number'] = self.phone_number
+
+        # Add custom error messages to self.error_messages
         self.error_messages.update({
-            'invalid_login': _(
-                "Please enter the correct %(username)s and password for a staff account."
-                " Note that both fields may be case-sensitive. "
-            ) % {'username': UserModel.USERNAME_FIELD},
-
-            'permission_denied': _("Please login with an account that has permissions to access the admin site"),
-
-            'inactive': _("This account is inactive."),
+            'invalid_login': 'Incorrect username or password.',
+            'permission_denied': 'Please login with an account that has permissions to access the admin site',
+            'inactive': 'This account is inactive.',
         })
 
     def validate(self, data):

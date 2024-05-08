@@ -117,6 +117,8 @@ class BaseAPIModelAdmin:
         return admin_views.DetailView.as_view(**defaults)(request, object_id, self)
 
     def add_view(self, request, **kwargs):
+        print(request.user)
+        print('========================')
         defaults = {
             'serializer_class': self.get_serializer_class(request),
             'permission_classes': self.admin_site.default_permission_classes,
