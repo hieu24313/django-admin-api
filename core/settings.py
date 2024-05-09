@@ -44,12 +44,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_api_admin',
     'corsheaders',
-    'apps.notification',
-    'apps.general',
-    # 'channels',
-    # 'celery',
-    # 'django_admin_inline_paginator',
-    'storages'
+    # 'storages'
 ]
 
 MIDDLEWARE = [
