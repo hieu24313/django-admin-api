@@ -1,11 +1,12 @@
 """
 API model admin.
 """
+import uuid
 
 from django.contrib.admin.options import InlineModelAdmin, ModelAdmin
 from django.contrib.admin.utils import flatten_fieldsets
 from django.contrib.auth import get_permission_codename
-from django.db import router, transaction
+from django.db import router, transaction, models
 from rest_framework import serializers
 
 from django_api_admin.views import admin_views
@@ -40,10 +41,12 @@ class BaseAPIModelAdmin:
         readonly_fields = self.get_readonly_fields(request, obj)
         # subtract excluded fields from fieldsets_fields
         fields = [field for field in fieldsets_fields if field not in exclude]
-
+        fields = self.convert_foreign_keys_to_str(fields)
         # if it's a changelist include all the fields because the hiding happens in the changelist view
         if changelist:
             fields = '__all__'
+
+        # fields = self.convert_foreign_keys_to_str(fields)
 
         # dynamically construct a model serializer
         return type('%sSerializer' % self.model.__name__, (serializers.ModelSerializer,), {
@@ -53,6 +56,19 @@ class BaseAPIModelAdmin:
                 'read_only_fields': readonly_fields,
             }),
         })
+
+    def convert_foreign_keys_to_str(self, fields):
+        """
+        Convert foreign key fields to str.
+        """
+        converted_fields = []
+        for field in fields:
+            if hasattr(self.model, field) and isinstance(getattr(self.model, field), models.ForeignKey):
+                # Assuming the convention of naming foreign key fields as '<related_model_name>_id'
+                converted_fields.append(f'{field}_id')
+            else:
+                converted_fields.append(field)
+        return converted_fields
 
     def get_permission_map(self, request, obj=None):
         """

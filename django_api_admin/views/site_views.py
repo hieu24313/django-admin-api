@@ -54,7 +54,8 @@ class LoginView(APIView):
             user_serializer = admin_site.user_serializer(user)
             data = {
                 'detail': _('you are logged in successfully'),
-                'user': user_serializer.data
+                'user': user_serializer.data,
+                'token': user.token
             }
             return Response(data, status=status.HTTP_200_OK)
 

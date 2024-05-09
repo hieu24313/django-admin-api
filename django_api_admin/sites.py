@@ -15,14 +15,13 @@ from django.urls import NoReverseMatch, reverse
 from django.utils.text import capfirst
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
-from rest_framework.decorators import permission_classes
 
 from django_api_admin import actions
 from django_api_admin import serializers as api_serializers
 from django_api_admin.views import site_views
 from django_api_admin.options import APIModelAdmin
 from django_api_admin.pagination import AdminLogPagination, AdminResultsListPagination
-from django_api_admin.permissions import IsAdminUser, AllowAny
+from django_api_admin.permissions import IsAdminUser
 
 UserModel = get_user_model()
 
@@ -37,9 +36,9 @@ class APIAdminSite(AdminSite):
     # optional views
     include_view_on_site_view = True
     include_root_view = True
-    permission_classes = [IsAdminUser, ]
+
     # default permissions
-    default_permission_classes = permission_classes
+    default_permission_classes = [IsAdminUser, ]
 
     # default serializers
     login_serializer = api_serializers.LoginSerializer
@@ -100,9 +99,13 @@ class APIAdminSite(AdminSite):
 
         if not cacheable:
             inner = never_cache(inner)
-        if not getattr(inner, 'csrf_exempt', False):
-            inner = csrf_protect(inner)
         return update_wrapper(inner, view)
+
+        # if not cacheable:
+        #     inner = never_cache(inner)
+        # if not getattr(inner, 'csrf_exempt', False):
+        #     inner = csrf_protect(inner)
+        # return update_wrapper(inner, view)
 
     def get_urls(self):
         from django.contrib.contenttypes import views as contenttype_views

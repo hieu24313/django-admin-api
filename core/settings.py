@@ -11,6 +11,9 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -41,9 +44,17 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_api_admin',
     'corsheaders',
+    'apps.notification',
+    'apps.general',
+    "apps.conversation",
+    'channels',
+    'celery',
+    'django_admin_inline_paginator',
+    'storages'
 ]
 
 MIDDLEWARE = [
+    "core.middleware.AddDataMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     "corsheaders.middleware.CorsMiddleware",
@@ -55,29 +66,29 @@ MIDDLEWARE = [
 ]
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication',
-        # Các lớp xác thực khác nếu bạn muốn sử dụng nhiều phương thức xác thực
-    ],
-    # Cấu hình khác của Django Rest Framework
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "apps.user.auth.JWTAuthentication",
+        # 'rest_framework.authentication.SessionAuthentication'
+    ]
 }
-
-CORS_ORIGIN_ALLOW_ALL = True
-
-CORS_ALLOW_ALL_ORIGINS = True
-CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_ALL_HEADERS = True
-CORS_ORIGIN_WHITELIST = [
-    'http://localhost',  # jest-dom test server
-    'http://localhost:3000',  # react developement server
-    'http://192.168.1.79:3000'
-]
+#
+# CORS_ORIGIN_ALLOW_ALL = True
+#
+# CORS_ALLOW_ALL_ORIGINS = True
+# CORS_ALLOW_CREDENTIALS = True
+# CORS_ALLOW_ALL_HEADERS = True
+# CORS_ORIGIN_WHITELIST = [
+#     'http://localhost',  # jest-dom test server
+#     'http://localhost:3000',  # react developement server
+#     'http://192.168.1.79:3000',
+#     'https://django-bolt.vercel.app'
+# ]
 # Đặt CSRF_TRUSTED_ORIGINS thành ['*']
 # CSRF_TRUSTED_ORIGINS = ['https://*.app', 'https://*.app', 'http://localhost', 'http://localhost:3000',
 #                         'https://localhost:3000', 'https://localhost']
-CSRF_TRUSTED_ORIGINS = ['http://localhost:3000', 'http://192.168.1.79:3000', 'http://192.168.1.79:3000', 'http://192.168.1.55:3000',
-                        'http://192.168.1.55']
-CSRF_COOKIE_SAMESITE = None
+# CSRF_TRUSTED_ORIGINS = ['http://localhost:3000', 'http://192.168.1.79:3000', 'http://192.168.1.79:3000', 'http://192.168.1.55:3000',
+#                         'http://192.168.1.55', 'https://django-bolt.vercel.app']
+# CSRF_COOKIE_SAMESITE = None
 # CSRF_COOKIE_DOMAIN = '.localhost'
 # SESSION_COOKIE_DOMAIN = '.localhost'
 
@@ -154,3 +165,75 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL')
+CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND')
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Asia/Ho_Chi_Minh'
+
+if os.getenv('USE_MINIO') == 'True':
+    STORAGES = {
+        "default": {"BACKEND": 'storages.backends.s3boto3.S3Boto3Storage'},
+        "staticfiles": {"BACKEND": 'storages.backends.s3boto3.S3Boto3Storage'},
+    }
+
+    AWS_ACCESS_KEY_ID = os.getenv("MINIO_ROOT_USER")
+    AWS_SECRET_ACCESS_KEY = os.getenv("MINIO_ROOT_PASSWORD")
+    AWS_STORAGE_BUCKET_NAME = os.getenv("MINIO_BUCKET_NAME")
+    AWS_S3_ENDPOINT_URL = os.getenv("MINIO_ENDPOINT")
+    AWS_DEFAULT_ACL = None
+    AWS_QUERYSTRING_AUTH = False
+    AWS_S3_FILE_OVERWRITE = False
+
+OTP_PROVIDER_ID = os.getenv('OTP_PROVIDER_ID')
+ZALO_OTP_URL = os.getenv('ZALO_OTP_URL')
+
+STRINGEE_APP_ID = os.getenv("STRINGEE_APP_ID")
+STRINGEE_APP_SECRET = os.getenv("STRINGEE_APP_SECRET")
+
+SILKY_PYTHON_PROFILER = True
+SILKY_AUTHENTICATION = True  # User must login
+SILKY_AUTHORISATION = True  # User must have permissions
+SILKY_META = True
+SILKY_HIDE_SENSITIVE = False
+
+SILKY_EXPLAIN_FLAGS = {'format':'JSON', 'costs': True}
+
+
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_HEADERS = True
+CORS_ORIGIN_WHITELIST = [
+    'http://localhost',  # jest-dom test server
+    'http://localhost:3000',  # react developement server
+    'http://192.168.1.79:3000',
+    'http://192.168.1.79',
+    'http://192.168.1.55:3000',
+    'http://192.168.1.55',
+    'https://django-bolt.vercel.app',
+    'https://django-bolt-git-main-andev916s-projects.vercel.app'
+]
+
+CORS_ALLOWED_ORIGINS = ['http://localhost:3000', 'http://192.168.1.79:3000', 'http://192.168.1.79:3000',
+                        'http://192.168.1.55:3000',
+                        'http://192.168.1.55', 'https://django-bolt.vercel.app',
+                        'https://django-bolt-git-main-andev916s-projects.vercel.app']
+
+CSRF_TRUSTED_ORIGINS = ['http://localhost:3000', 'http://192.168.1.79:3000', 'http://192.168.1.79:3000', 'http://192.168.1.55:3000',
+                        'http://192.168.1.55', 'https://django-bolt.vercel.app', 'https://django-bolt-git-main-andev916s-projects.vercel.app', 'https://django-bolt.vercel.app/login']
+
+# CSRF_COOKIE_DOMAIN = '.vercel.app'
+# SESSION_COOKIE_DOMAIN = '.vercel.app'
+# SESSION_COOKIE_HTTPONLY = True
+CSRF_COOKIE_SAMESITE = None
+CSRF_COOKIE_NAME = 'csrftoken'
+# CSRF_COOKIE_HTTPONLY = True
+# CSRF_USE_SESSIONS = True
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False  # Không yêu cầu cookie CSRF phải được gửi qua HTTPS
+
+# CSRF_COOKIE_SECURE = False

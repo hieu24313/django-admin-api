@@ -1,6 +1,10 @@
 """
 Model admin views.
 """
+import json
+import uuid
+from collections import OrderedDict
+
 from django.db.models import Model
 from django.db import transaction
 from django.utils.translation import gettext_lazy as _
@@ -22,6 +26,7 @@ from django_api_admin.declarations.functions import (get_form_fields,
                                                      get_form_config,
                                                      validate_bulk_edits,
                                                      get_inlines)
+from django_api_admin.helper import convert_primary_key_related_uuid_to_str
 
 
 class ListView(APIView):
@@ -131,6 +136,7 @@ class AddView(APIView):
         data = dict()
         serializer = self.serializer_class()
         data['fields'] = get_form_fields(serializer)
+        data = convert_primary_key_related_uuid_to_str(data)
         data['config'] = get_form_config(model_admin)
         inlines = get_inlines(request, model_admin)
         if len(inlines):
@@ -232,12 +238,16 @@ class ChangeView(APIView):
         serializer = None
 
         if request.method == 'PATCH':
+            # serializer = self.serializer_class(
+            #     instance=obj, data=request.data.get('data', {}), partial=True)
             serializer = self.serializer_class(
-                instance=obj, data=request.data.get('data', {}), partial=True)
+                instance=obj, data=request.data, partial=True)
 
         elif request.method == 'PUT':
+            # serializer = self.serializer_class(
+            #     instance=obj, data=request.data.get('data', {}))
             serializer = self.serializer_class(
-                instance=obj, data=request.data.get('data', {}))
+                instance=obj, data=request.data)
 
         elif request.method == 'GET':
             serializer = self.serializer_class(instance=obj)
@@ -276,10 +286,11 @@ class ChangeView(APIView):
             data['fields'] = get_form_fields(serializer, change=True)
             data['config'] = get_form_config(model_admin)
             inlines = get_inlines(request, model_admin, obj=obj)
+
+            data = convert_primary_key_related_uuid_to_str(data)
             if inlines:
                 data['inlines'] = inlines
             return Response(data, status=status.HTTP_200_OK)
-
         # update and log the changes to the object
         if serializer.is_valid():
             updated_object = serializer.save()
@@ -335,7 +346,6 @@ class ChangeView(APIView):
                 data['updated_inlines'] = updated_inlines
             if len(deleted_inlines):
                 data['deleted_inlines'] = deleted_inlines
-
             return Response(data, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
