@@ -145,6 +145,7 @@ class AddView(APIView):
 
     @transaction.atomic
     def post(self, request, model_admin):
+        request.data['data'] = request.data.copy()
         # if the user doesn't have added permission respond with permission denied
         if not model_admin.has_add_permission(request):
             raise PermissionDenied
