@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_api_admin',
     'corsheaders',
-    # 'storages'
+    'storages'
 ]
 
 MIDDLEWARE = [
