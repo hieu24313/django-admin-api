@@ -40,5 +40,5 @@ def send_notification_user_contact(sender, instance, **kwargs):
     # Set cache
     cache_key = f"user_info_{instance.id}"
     cache.delete(cache_key)
-    cache.set(cache_key, BaseInforUserSerializer(instance).data, timeout=DevSetting.get_value('cache_time_out'))
+    # cache.set(cache_key, BaseInforUserSerializer(instance).data, timeout=DevSetting.get_value('cache_time_out'))
 

@@ -15,9 +15,8 @@ from phonenumber_field.modelfields import PhoneNumberField
 
 from django.utils.functional import cached_property
 
-from api.services.stringee import get_access_token
+# from api.services.stringee import get_access_token
 from apps.general.models import FileUpload, DefaultAvatar, AppConfig
-from ultis.validate import JsonWordValidator, banned_words
 
 
 class CustomUserManager(BaseUserManager):
@@ -167,8 +166,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     )
     # Thông tin cơ bản
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    full_name = models.CharField(max_length=100, blank=True, null=True, verbose_name="Họ và tên",
-                                 validators=[JsonWordValidator(banned_words)])
+    full_name = models.CharField(max_length=100, blank=True, null=True, verbose_name="Họ và tên")
     bio = models.CharField(max_length=500, blank=True, null=True, verbose_name="Bio")
     email = models.EmailField(null=True, blank=True)
     phone_number = PhoneNumberField(unique=True, null=True, default="", verbose_name="Số điện thoại")
@@ -237,8 +235,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     @property
     def get_avatar(self):
-        if self.avatar is None:
-            return str(DefaultAvatar.objects.get(key='avatar').image.url)
+        # if self.avatar is None:
+        #     return str(DefaultAvatar.objects.get(key='avatar').image.url)
 
         return str(self.avatar.file.url)
 
@@ -276,7 +274,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         self.save()
 
     def new_stringee_token(self):
-        self.stringeeUID = get_access_token(str(self.id))[0]
+        self.stringeeUID = '123123123123'
         self.save()
 
     class Meta:

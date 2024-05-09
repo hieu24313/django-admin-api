@@ -1,4 +1,4 @@
-from api.services.firebase import send_and_save_notification
+# from api.services.firebase import send_and_save_notification
 from apps.notification.serializers import NotificationSerializer
 from ultis.socket_helper import get_socket_data, send_noti_to_socket_user
 
@@ -20,14 +20,14 @@ def send_noti_add_friend(sender, receiver, status, request):
     direct_user = sender
     type_noti = 'FRIEND'
     custom_data = {'type': 'request_friend'}
-    notification = send_and_save_notification(user=receiver, title=title, body=body, direct_type=direct_type,
-                                              direct_value=direct_value, direct_user=direct_user,
-                                              custom_data=custom_data,
-                                              type_noti=type_noti)
+    # notification = send_and_save_notification(user=receiver, title=title, body=body, direct_type=direct_type,
+    #                                           direct_value=direct_value, direct_user=direct_user,
+    #                                           custom_data=custom_data,
+    #                                           type_noti=type_noti)
     # (user, title, body, direct_type, direct_value, direct_user, custom_data=None,
-    data_serializer = NotificationSerializer(notification, context={'request': request}).data
+    # data_serializer = NotificationSerializer(notification, context={'request': request}).data
 
-    send_noti_to_socket_user(str(receiver.id), get_socket_data('NEW_NOTIFICATION', data_serializer))
+    # send_noti_to_socket_user(str(receiver.id), get_socket_data('NEW_NOTIFICATION', data_serializer))
 
 
 def send_noti_accept_friend(sender, receiver, status, request):
@@ -49,14 +49,14 @@ def send_noti_accept_friend(sender, receiver, status, request):
     type_noti = 'FRIEND'
     custom_data = {'type': 'accept_friend'}
 
-    notification = send_and_save_notification(user=sender, title=title, body=body, direct_type=direct_type,
-                                              direct_value=direct_value, direct_user=direct_user,
-                                              custom_data=custom_data,
-                                              type_noti=type_noti)
+    # notification = send_and_save_notification(user=sender, title=title, body=body, direct_type=direct_type,
+    #                                           direct_value=direct_value, direct_user=direct_user,
+    #                                           custom_data=custom_data,
+    #                                           type_noti=type_noti)
 
-    data_serializer = NotificationSerializer(notification, context={'request': request}).data
-
-    send_noti_to_socket_user(str(sender.id), get_socket_data('NEW_NOTIFICATION', data_serializer))
+    # data_serializer = NotificationSerializer(notification, context={'request': request}).data
+    #
+    # send_noti_to_socket_user(str(sender.id), get_socket_data('NEW_NOTIFICATION', data_serializer))
 
 
 def send_noti_report_to_user(sender, count):
@@ -76,10 +76,10 @@ def send_noti_report_to_user(sender, count):
     type_noti = 'REPORT'
     custom_data = None
 
-    notification = send_and_save_notification(user=sender, title=title, body=body, direct_type=direct_type,
-                                              direct_value=direct_value, direct_user=direct_user,
-                                              custom_data=custom_data,
-                                              type_noti=type_noti)
-    data_serializer = NotificationSerializer(notification).data
-
-    send_noti_to_socket_user(str(sender.id), get_socket_data('NEW_NOTIFICATION', data_serializer))
+    # notification = send_and_save_notification(user=sender, title=title, body=body, direct_type=direct_type,
+    #                                           direct_value=direct_value, direct_user=direct_user,
+    #                                           custom_data=custom_data,
+    #                                           type_noti=type_noti)
+    # data_serializer = NotificationSerializer(notification).data
+    #
+    # send_noti_to_socket_user(str(sender.id), get_socket_data('NEW_NOTIFICATION', data_serializer))

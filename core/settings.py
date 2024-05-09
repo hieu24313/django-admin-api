@@ -46,10 +46,9 @@ INSTALLED_APPS = [
     'corsheaders',
     'apps.notification',
     'apps.general',
-    "apps.conversation",
     # 'channels',
     # 'celery',
-    'django_admin_inline_paginator',
+    # 'django_admin_inline_paginator',
     'storages'
 ]
 

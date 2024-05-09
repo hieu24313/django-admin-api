@@ -1,11 +1,11 @@
 from asgiref.sync import async_to_sync
 # from channels.layers import get_channel_layer
 
-from apps.conversation.models import Room, RoomUser, Message
-from apps.conversation.serializers import MessageSerializer
-from apps.user.serializers import UserFriendShipSerializer, UserSerializer
-
-from apps.conversation.models import Room, RoomUser
+# from apps.conversation.models import Room, RoomUser, Message
+# from apps.conversation.serializers import MessageSerializer
+# from apps.user.serializers import UserFriendShipSerializer, UserSerializer
+#
+# from apps.conversation.models import Room, RoomUser
 from apps.notification.models import Notification
 from apps.notification.serializers import NotificationSerializer
 from apps.user.serializers import UserFriendShipSerializer
