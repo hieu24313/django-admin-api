@@ -1,6 +1,5 @@
 from itertools import chain
-
-from celery import shared_task
+# from celery import shared_task
 from django.core.cache import cache
 from django.db.models import Q, Subquery
 from django.db.models.signals import post_save

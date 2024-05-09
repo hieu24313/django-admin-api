@@ -1,5 +1,5 @@
 from asgiref.sync import async_to_sync
-from channels.layers import get_channel_layer
+# from channels.layers import get_channel_layer
 
 from apps.conversation.models import Room, RoomUser, Message
 from apps.conversation.serializers import MessageSerializer
@@ -12,29 +12,31 @@ from apps.user.serializers import UserFriendShipSerializer
 
 
 def send_to_socket(app, name, data):
-    channel_layer = get_channel_layer()
-    room_group_name = f"{app}_{name}"
-
-    async_to_sync(channel_layer.group_send)(
-        room_group_name,
-        {
-            "type": f"{app}.message",
-            "message": data,
-        }
-    )
+    pass
+    # channel_layer = get_channel_layer()
+    # room_group_name = f"{app}_{name}"
+    #
+    # async_to_sync(channel_layer.group_send)(
+    #     room_group_name,
+    #     {
+    #         "type": f"{app}.message",
+    #         "message": data,
+    #     }
+    # )
 
 
 def send_noti_to_socket_user(user_id, data):
-    channel_layer = get_channel_layer()
-    room_group_name = f"user_{user_id}"
-
-    async_to_sync(channel_layer.group_send)(
-        room_group_name,
-        {
-            "type": f"user.message",
-            "message": data,
-        }
-    )
+    pass
+    # channel_layer = get_channel_layer()
+    # room_group_name = f"user_{user_id}"
+    #
+    # async_to_sync(channel_layer.group_send)(
+    #     room_group_name,
+    #     {
+    #         "type": f"user.message",
+    #         "message": data,
+    #     }
+    # )
 
 
 def get_socket_data(event, data):

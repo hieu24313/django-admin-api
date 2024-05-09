@@ -1,5 +1,5 @@
 from asgiref.sync import async_to_sync
-from channels.layers import get_channel_layer
+# from channels.layers import get_channel_layer
 from django.db.models import Case, When, Value, IntegerField
 from firebase_admin import messaging
 

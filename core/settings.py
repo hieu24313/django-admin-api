@@ -47,8 +47,8 @@ INSTALLED_APPS = [
     'apps.notification',
     'apps.general',
     "apps.conversation",
-    'channels',
-    'celery',
+    # 'channels',
+    # 'celery',
     'django_admin_inline_paginator',
     'storages'
 ]
