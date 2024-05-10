@@ -4,9 +4,12 @@ Model admin views.
 import json
 import uuid
 from collections import OrderedDict
+from copy import copy
 
+from django.core.paginator import Paginator, EmptyPage
 from django.db.models import Model
 from django.db import transaction
+from django.http import HttpRequest, QueryDict
 from django.utils.translation import gettext_lazy as _
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import FieldDoesNotExist, ObjectDoesNotExist
@@ -16,6 +19,7 @@ from django.contrib.admin.options import (TO_FIELD_VAR,
                                           get_content_type_for_model)
 
 from rest_framework import status
+from rest_framework.request import Request
 from rest_framework.views import APIView
 from rest_framework.reverse import reverse
 from rest_framework.response import Response
@@ -27,6 +31,7 @@ from django_api_admin.declarations.functions import (get_form_fields,
                                                      validate_bulk_edits,
                                                      get_inlines)
 from django_api_admin.helper import convert_primary_key_related_uuid_to_str
+from django_api_admin.pagination import AdminResultsListPagination
 
 
 class ListView(APIView):
@@ -193,7 +198,7 @@ class AddView(APIView):
 
 class ChangeView(APIView):
     """
-    Change an existing instance of this model. if the models has inline models associated with it you 
+    Change an existing instance of this model. if the models has inline models associated with it you
     create, update and delete instances of the models associated with it.
 
         {
@@ -463,11 +468,23 @@ class ChangeListView(APIView):
 
     def get(self, request, model_admin):
         try:
+            # new_request = copy(request._request)
+            # limit = request.GET.get('limit', 10)
+            # page = request.GET.get('page', 1)
+            # pagin = False
+            # if request.GET.get('limit') is not None and request.GET.get('page') is not None:
+            #     pagin = True
+            # print(limit)
+            # print(page)
+            # new_request.GET = {}
+            # cl = model_admin.get_changelist_instance(new_request)
             cl = model_admin.get_changelist_instance(request)
         except IncorrectLookupParameters as e:
             raise NotFound(str(e))
         columns = self.get_columns(request, cl)
+        # rows = self.get_rows(request, cl, limit, page)
         rows = self.get_rows(request, cl)
+        # config = self.get_config(request, cl, pagin)
         config = self.get_config(request, cl)
         return Response({'config': config, 'columns': columns, 'rows': rows},
                         status=status.HTTP_200_OK)
@@ -483,12 +500,72 @@ class ChangeListView(APIView):
             columns.append({'field': field_name, 'headerName': text})
         return columns
 
+    # def get_rows(self, request, cl, limit, page):
+    #     """
+    #     Return changelist rows actual list of data.
+    #     """
+    #     rows = []
+    #
+    #     # Tạo một đối tượng Paginator từ result_list
+    #     paginator = Paginator(cl.result_list, limit)
+    #
+    #     # Lấy dữ liệu cho trang hiện tại
+    #     try:
+    #         results = paginator.page(page)
+    #     except EmptyPage:
+    #         results = paginator.page(paginator.num_pages)  # Nếu page trống, lấy trang cuối cùng
+    #     except ValueError:
+    #         results = paginator.page(1)  # Nếu page không hợp lệ, lấy trang đầu tiên
+    #
+    #     empty_value_display = cl.model_admin.get_empty_value_display()
+    #     for result in results:
+    #         model_info = (cl.model_admin.admin_site.name, type(
+    #             result)._meta.app_label, type(result)._meta.model_name)
+    #         row = {
+    #             'change_url': reverse('%s:%s_%s_change' % model_info, kwargs={'object_id': result.pk}, request=request),
+    #             'id': result.pk,
+    #             'cells': {}
+    #         }
+    #
+    #         for field_name in self.get_fields_list(request, cl):
+    #             try:
+    #                 _, _, value = lookup_field(
+    #                     field_name, result, cl.model_admin)
+    #
+    #                 # if the value is a Model instance get the string representation
+    #                 if value and isinstance(value, Model):
+    #                     result_repr = str(value)
+    #                 else:
+    #                     result_repr = value
+    #
+    #                 # if there are choices display the choice description string instead of the value
+    #                 try:
+    #                     model_field = result._meta.get_field(field_name)
+    #                     choices = getattr(model_field, 'choices', None)
+    #                     if choices:
+    #                         result_repr = [
+    #                             choice for choice in choices if choice[0] == value
+    #                         ][0][1]
+    #                 except FieldDoesNotExist:
+    #                     pass
+    #
+    #                 # if the value is null set result_repr to empty_value_display
+    #                 if value == None:
+    #                     result_repr = empty_value_display
+    #
+    #             except ObjectDoesNotExist:
+    #                 result_repr = empty_value_display
+    #
+    #             row['cells'][field_name] = result_repr
+    #         rows.append(row)
+    #     return rows
+
     def get_rows(self, request, cl):
         """
         Return changelist rows actual list of data.
         """
         rows = []
-        # generate changelist attributes (e.g result_list, paginator, result_count)
+
         cl.get_results(request)
         empty_value_display = cl.model_admin.get_empty_value_display()
         for result in cl.result_list:
@@ -538,7 +615,7 @@ class ChangeListView(APIView):
 
         # add the ModelAdmin attributes that the changelist uses
         for option_name in cl.model_admin.changelist_options:
-            config[option_name] = (getattr(cl.model_admin, option_name, None))
+            config[option_name] = getattr(cl.model_admin, option_name, None)
 
         # changelist pagination attributes
         config['full_count'] = cl.full_result_count

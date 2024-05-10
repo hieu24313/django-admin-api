@@ -64,7 +64,11 @@ class APIAdminSite(AdminSite):
             self.register([UserModel, Group])
 
     def register(self, model_or_iterable, admin_class=None, **options):
-        admin_class = admin_class or self.admin_class
+        if admin_class is not None:
+            self.admin_class = admin_class
+            print(admin_class.list_display)
+        else:
+            admin_class = self.admin_class
 
         if isinstance(model_or_iterable, ModelBase):
             model_or_iterable = [model_or_iterable]

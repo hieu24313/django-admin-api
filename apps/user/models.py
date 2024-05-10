@@ -245,7 +245,7 @@ class Notification(models.Model):
 
 class HomeContent(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    title = models.CharField(max_length=255, default="", null=True, blank=True, verbose_name="Tiêu đề")
+    title = models.CharField(max_length=255, default="", null=True, blank=True, verbose_name="Tiêu đề 1")
     introduce_content = models.TextField(blank=True, null=True, verbose_name="Nội dung giới thiệu")
     terms_content = models.TextField(blank=True, null=True, verbose_name="Nội dung chính")
     image = models.ImageField(upload_to='assets/homecontent', null=True, blank=True, verbose_name="Ảnh")

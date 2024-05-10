@@ -3,9 +3,9 @@ from math import ceil
 
 
 class AdminResultsListPagination(PageNumberPagination):
-    page_size = 100
-    page_size_query_param = 'page_size'
-    page_query_param = 'p'
+    page_size = 2
+    page_size_query_param = 'limit'
+    page_query_param = 'page'
 
     def get_num_of_pages(self, list_of_items):
         return ceil(len(list_of_items) / self.page_size)
@@ -16,5 +16,5 @@ class AdminResultsListPagination(PageNumberPagination):
 
 class AdminLogPagination(PageNumberPagination):
     page_size = 8
-    page_size_query_param = 'page_size'
-    page_query_param = 'p'
+    page_size_query_param = 'limit'
+    page_query_param = 'page'
